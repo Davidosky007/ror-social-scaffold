@@ -4,37 +4,28 @@ class User < ApplicationRecord
   devise :database_authenticatable, :registerable,
          :recoverable, :rememberable, :validatable
 
-  validates :name, presence: true, length: { maximum: 20 }
+  validates :name, presence: true, length: { maximum: 20 }, uniqueness: true
 
-  has_many :posts
+  has_many :posts, dependent: :destroy
+  has_many :friendships, dependent: :destroy, foreign_key: 'inviter_id'
+  has_many :inverse_friendships, class_name: 'Friendship', foreign_key: 'invitee_id'
   has_many :comments, dependent: :destroy
   has_many :likes, dependent: :destroy
-  has_many :friendships
-  has_many :inverse_friendships, class_name: 'Friendship', foreign_key: 'friend_id'
 
-  def friends
-    friends_array = friendships.map { |friendship| friendship.friend if friendship.status }
-    friends_array.concat(inverse_friendships.map { |friendship| friendship.user if friendship.status })
-    friends_array.compact
-  end
+  has_many :confirmed_friendships, -> { where confirmed: true }, class_name: 'Friendship'
+  has_many :friends, through: :confirmed_friendships
 
-  # Users who have yet to confirme friend requests
-  def pending_friends
-    friendships.map { |friendship| friendship.friend unless friendship.status }.compact
-  end
+  has_many :pending_friendships, -> { where confirmed: false }, class_name: 'Friendship', foreign_key: 'inviter_id'
+  has_many :pending_friends, through: :pending_friendships, source: :friend
 
-  # Users who have requested to be friends
-  def friend_requests
-    inverse_friendships.map { |friendship| friendship.user unless friendship.status }.compact
-  end
-
-  def confirm_friend(user)
-    friendship = inverse_friendships.find { |friendship| friendship.user == user }
-    friendship.status = true
-    friendship.save
-  end
+  has_many :inverted_friendships, -> { where confirmed: false }, class_name: 'Friendship', foreign_key: 'invitee_id'
+  has_many :friend_requests, through: :inverted_friendships, source: :user
 
   def friend?(user)
     friends.include?(user)
+  end
+
+  def request_exists?(user)
+    true if pending_friends.include?(user) || friend_requests.include?(user)
   end
 end

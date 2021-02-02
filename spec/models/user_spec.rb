@@ -1,16 +1,49 @@
 require 'rails_helper'
 
-RSpec.describe User, type: :model do
-  let(:user1) { User.create(id: 1, name: 'user1', email: 'user1@gmail.com', password: '123456') }
-  let(:user2) { User.create(id: 2, name: 'user2', email: 'user2@gmail.com', password: '123456') }
-  let(:user3) { User.create(id: 3, name: 'user3', email: 'user3@gmail.com', password: '123456') }
-  describe 'friends' do
-    it 'returns friends of a given user' do
-      Friendship.create(user_id: 1, friend_id: 92, status: true)
-      Friendship.create(user_id: 1, friend_id: 93, status: true)
-      puts 'output'
-      puts user1.friends
-      expect(user1.friends).to eq(%w[user1 user2])
+RSpec.describe User do
+   let(:subject) do
+    described_class.new(
+      name: 'user_example',
+      email: 'user@email.com',
+      password: 'password'
+    )
+  end
+
+  describe 'validations' do
+    it { is_expected.to validate_presence_of(:name) }
+    it { is_expected.to validate_presence_of(:email) }
+    it { is_expected.to validate_presence_of(:password) }
+
+    it 'is valid with valid attribute' do
+      expect(subject).to be_valid
     end
+
+    it 'The name of the user should exist' do
+      subject.name = ''
+      expect(subject).not_to be_valid
+    end
+
+    it 'The name of the user should not be longer than 20 characters' do
+      subject.name = 'weiruwieruiowueriuioweuriuwioeurwioeriouiowerui'
+      expect(subject).not_to be_valid
+    end
+
+    it 'The email should exist' do
+      subject.email = ''
+      expect(subject).not_to be_valid
+    end
+
+    it 'The email should have the right format' do
+      subject.email = 'hello'
+      expect(subject).not_to be_valid
+    end
+  end
+
+  describe 'Associations', type: :model do
+    it { is_expected.to have_many(:posts) }
+    it { is_expected.to have_many(:comments) }
+    it { is_expected.to have_many(:likes) }
+    it { is_expected.to have_many(:friendships) }
+    it { is_expected.to have_many(:inverse_friendships) }
   end
 end
