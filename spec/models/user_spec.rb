@@ -1,7 +1,7 @@
 require 'rails_helper'
 
 RSpec.describe User do
-   let(:subject) do
+  let(:subject) do
     described_class.new(
       name: 'user_example',
       email: 'user@email.com',

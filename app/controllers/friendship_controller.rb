@@ -1,5 +1,5 @@
 class FriendshipController < ApplicationController
-   def new
+  def new
     @friendship = Friendship.new
   end
 

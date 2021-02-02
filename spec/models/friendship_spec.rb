@@ -1,7 +1,7 @@
 require 'rails_helper'
 
 RSpec.describe Friendship, type: :model do
- let(:test_user) { User.create(name: 'Example User', email: 'abcefg@gmail.com', password: 'password') }
+  let(:test_user) { User.create(name: 'Example User', email: 'abcefg@gmail.com', password: 'password') }
   let(:test_friend) { User.create(name: 'Example Friend', email: 'abcjkkj@gmail.com', password: 'password') }
 
   let(:subject) do

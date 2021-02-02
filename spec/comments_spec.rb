@@ -13,7 +13,6 @@ RSpec.describe Comment do
   end
 
   describe 'validations' do
-
     it 'The content of the comment length < 200' do
       subject.content = '0' * 205
       expect(subject).not_to be_valid
