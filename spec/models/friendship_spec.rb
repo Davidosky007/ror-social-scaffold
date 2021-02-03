@@ -1,32 +1,78 @@
 require 'rails_helper'
 
-RSpec.describe Friendship, type: :model do
-  let(:test_user) { User.create(name: 'Example User', email: 'abcefg@gmail.com', password: 'password') }
-  let(:test_friend) { User.create(name: 'Example Friend', email: 'abcjkkj@gmail.com', password: 'password') }
+RSpec.describe 'Friendship management', type: :feature do
+  let(:user) { User.create(name: 'Youcef', email: 'youcefabdellani@gmail.com', password: 'password123') }
+  let(:friend) { User.create(name: 'David', email: 'David@gmail.com', password: 'password123') }
 
-  let(:subject) do
-    described_class.new(
-      inviter_id: test_user.id,
-      invitee_id: test_friend.id
-    )
+  scenario 'Send friend request from Users index page' do
+    friend = User.create(name: 'David', email: 'David@gmail.com', password: 'password123')
+    visit root_path
+    fill_in 'user_email', with: user.email
+    fill_in 'user_password', with: user.password
+    click_on 'Log in'
+    sleep(3)
+    expect(page).to have_content('Signed in successfully.')
+    click_on 'All users'
+    sleep(3)
+    expect(page).to have_content("Name: #{friend.name}")
+    expect(page).to have_button('Add friend')
+    first('.btn-secondary').click # Click on the first 'Add friend' buttons
+    sleep(3)
+    expect(page).to have_content('Friend request was successfully sent.')
   end
-
-  describe 'validations' do
-    it 'is valid with valid attributes' do
-      expect(subject).to be_valid
-    end
-
-    it 'is not valid without a user' do
-      subject.inviter_id = ''
-      expect(subject).not_to be_valid
-    end
-
-    it 'is not valid without a friend' do
-      subject.invitee_id = ''
-      expect(subject).not_to be_valid
-    end
+  scenario 'Send friend request from Users show page' do
+    friend = User.create(name: 'David', email: 'David@gmail.com', password: 'password123')
+    visit root_path
+    fill_in 'user_email', with: user.email
+    fill_in 'user_password', with: user.password
+    click_on 'Log in'
+    sleep(3)
+    expect(page).to have_content('Signed in successfully.')
+    click_on 'All users'
+    sleep(3)
+    expect(page).to have_content("Name: #{friend.name}")
+    first('.profile-link').click # Click on the first 'See Profile' link
+    sleep(3)
+    expect(page).to have_content("Name: #{friend.name}")
+    expect(page).to have_button('Add friend')
+    click_on 'Add friend'
+    sleep(3)
+    expect(page).to have_content('Friend request was successfully sent.')
   end
-
-  it { is_expected.to belong_to(:inviter) }
-  it { is_expected.to belong_to(:invitee) }
+  scenario 'Accept friendship' do
+    user.friendships.build(friend_id: friend.id, confirmed: false).save
+    visit root_path
+    fill_in 'user_email', with: friend.email
+    fill_in 'user_password', with: friend.password
+    click_on 'Log in'
+    sleep(3)
+    expect(page).to have_content('Signed in successfully.')
+    click_on 'Friend Requests'
+    sleep(3)
+    expect(page).to have_content("Name: #{user.name}")
+    expect(page).to have_button('Accept')
+    expect(page).to have_button('Decline')
+    click_on 'Accept'
+    sleep(3)
+    expect(page).to have_content('Friend request was successfully confirmed')
+    expect(page).to have_content("Name: #{friend.name}")
+  end
+  scenario 'Decline friendship' do
+    user.friendships.build(friend_id: friend.id, confirmed: false).save
+    visit root_path
+    fill_in 'user_email', with: friend.email
+    fill_in 'user_password', with: friend.password
+    click_on 'Log in'
+    sleep(3)
+    expect(page).to have_content('Signed in successfully.')
+    click_on 'Friend Requests'
+    sleep(3)
+    expect(page).to have_content("Name: #{user.name}")
+    expect(page).to have_button('Accept')
+    expect(page).to have_button('Decline')
+    click_on 'Decline'
+    sleep(3)
+    expect(page).to have_content('Friend request declined, we won\'t inform the user')
+    expect(page).to have_content("Name: #{friend.name}")
+  end
 end
