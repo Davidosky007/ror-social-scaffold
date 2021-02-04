@@ -1,39 +1,43 @@
 class FriendshipsController < ApplicationController
+  def new
+    @friendship = Friendship.new
+  end
+
   def create
-    @friendship = current_user.friendships.build(friend_id: params[:user_id])
-    @friendship.confirmed = false
-    if @friendship.save
-      flash[:notice] = 'Friend request was successfully sent.'
-      redirect_to root_url
+    @friendship = Friendship.new(friendship_params)
+    if new_request? && @friendship.valid? && @friendship.save
+      redirect_to users_path
+    elsif !new_request?
+      redirect_to users_path, alert: 'You have already sent a request'
     else
-      redirect_to root_url, alert: @friendship.errors.full_messages.join('. ').to_s
+      render 'users/index'
     end
   end
+
+  def show; end
 
   def update
     @friendship = Friendship.find(params[:id])
-    @friendship.confirmed = true
-
-    if @friendship.save
-      @friendship.confirm_friend
-      redirect_to user_path(current_user.id), notice: 'Friend request was successfully confirmed.'
-    else
-      redirect_to user_path(current_user.id), alert: @friendship.error.full_messages.join('. ').to_s
-    end
-  end
-
-  def index
-    @friendships = current_user.friendships
-    @inverse_friendships = current_user.inverse_friendships
+    redirect_to users_path if @friendship.confirmed == false && @friendship.confirm_friend
   end
 
   def destroy
-    @friendship = Friendship.find_by(friend_id: current_user.id, user_id: params[:user_id])
+    @friendship = Friendship.where(user_id: [params[:id], current_user.id], friend_id: [current_user.id, params[:id]])
 
-    if @friendship.destroy
-      redirect_to user_path(current_user.id), notice: 'Friend request declined, we won\'t inform the user'
+    if !@friendship.nil? && @friendship.each(&:destroy)
+      redirect_to users_path
     else
-      redirect_to user_path(current_user.id), alert: @friendship.errors.full_messages.join('. ').to_s
+      render 'users/index'
     end
+  end
+
+  private
+
+  def new_request?
+    !current_user.request_exists?(User.find_by(id: params[:friendship][:friend_id]))
+  end
+
+  def friendship_params
+    params.require(:friendship).permit(:user_id, :friend_id, :confirmed)
   end
 end

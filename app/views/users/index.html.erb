@@ -1,7 +1,5 @@
-<section class="users-section">
+<section class="users-section ">
   <ul class="users-list">
-    <% @users.each do |user| %>
-      <%= user_info(user) %>
-    <% end %>
+    <%= render @users %>
   </ul>
-</section> 
+</section>

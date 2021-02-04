@@ -1,5 +1,4 @@
 require 'rails_helper'
-require 'shoulda/matchers'
 
 RSpec.describe Comment do
   let(:user) { User.create(name: 'Example User', email: 'abc@example.com', password: 'abc') }
@@ -13,6 +12,8 @@ RSpec.describe Comment do
   end
 
   describe 'validations' do
+    it { is_expected.to validate_presence_of(:content) }
+
     it 'The content of the comment length < 200' do
       subject.content = '0' * 205
       expect(subject).not_to be_valid
