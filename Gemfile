@@ -44,8 +44,8 @@ group :development, :test do
   gem 'byebug', platforms: %i[mri mingw x64_mingw]
   gem 'capybara'
   gem 'rspec-rails', '~> 4.0.1'
-  gem 'shoulda-matchers', '~> 4.0'
   gem 'selenium-webdriver'
+  gem 'shoulda-matchers', '~> 4.0'
   # gem 'chromedriver-helper'
   gem 'webdrivers'
 end
