@@ -35,7 +35,7 @@ gem 'wdm', '>= 0.1.0' if Gem.win_platform?
 # gem 'capistrano-rails', group: :development
 
 # Reduces boot times through caching; required in config/boot.rb
-gem 'bootsnap', '>= 1.1.0', require: false
+gem 'bootsnap', '~> 1.1', '>= 1.1.1'
 
 gem 'devise'
 
