@@ -19,3 +19,9 @@ RSpec.describe Comment do
       expect(subject).not_to be_valid
     end
   end
+
+  describe 'Associations', type: :model do
+    it { is_expected.to belong_to(:user) }
+    it { is_expected.to belong_to(:post) }
+  end
+end
