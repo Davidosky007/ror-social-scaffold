@@ -8,7 +8,7 @@
 - Ruby on Rails v5.2.4
 
 ## Live Demo
-<h1> Live Demo: [https://arcane-falls-21531.herokuapp.com/] </h1>
+<h1> Live Demo: [Click Here](https://arcane-falls-21531.herokuapp.com) </h1>
 TBA
 
 
